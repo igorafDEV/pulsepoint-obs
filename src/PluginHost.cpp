@@ -43,6 +43,8 @@ juce::Array<juce::File> candidates (const juce::String& chosen)
     auto add = [&files] (const juce::String& path)
     {
         auto p = path.trim();
+        if (p.startsWithChar (0xfeff))   // o Inno Setup grava UTF-8 com BOM
+            p = p.substring (1);
         if (juce::File::isAbsolutePath (p))
             files.addIfNotAlreadyThere (juce::File (p));
     };
@@ -214,7 +216,7 @@ public:
 
         if (window == nullptr)
         {
-            auto* editor = instance->createEditorIfNeeded();
+            auto* editor = instance->createEditorAndMakeActive();
             if (editor == nullptr)
                 return;
             window = std::make_unique<EditorWindow> (editor);
